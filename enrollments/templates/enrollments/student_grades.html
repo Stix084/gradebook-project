@@ -1,0 +1,57 @@
+
+<h1>Student Grades Page</h1>
+
+
+<p>Status: <strong>{{ enrollment.get_status_display }}</strong></p>
+
+{% if enrollment.status == "COMPLETED" %}
+    <span class="badge bg-success">Final Grade</span>
+{% else %}
+    <span class="badge bg-warning">Provisional</span>
+{% endif %}
+
+
+
+
+{% if enrollment.is_locked %}
+    <span class="badge bg-success">Final</span>
+{% else %}
+    <span class="badge bg-warning">Provisional</span>
+{% endif %}
+
+{% for enrollment in enrollments %}
+  <hr>
+  <h2>{{ enrollment.course.code }} – {{ enrollment.course.name }}</h2>
+  <p><strong>Academic Year:</strong> {{ enrollment.course.academic_year }}</p>
+  <p><strong>Status:</strong> {{ enrollment.status }}</p>
+
+  <table border="1" cellpadding="6">
+    <tr>
+      <th>Component</th>
+      <th>Assessment</th>
+      <th>Score</th>
+      <th>Max</th>
+      <th>%</th>
+    </tr>
+
+    {% for grade in enrollment.grades.all %}
+      <tr>
+        <td>{{ grade.assessment_item.component.name }}</td>
+        <td>{{ grade.assessment_item.name }}</td>
+        <td>{{ grade.score }}</td>
+        <td>{{ grade.max_score }}</td>
+        <td>{{ grade.percentage|floatformat:2 }}%</td>
+      </tr>
+    {% endfor %}
+  </table>
+
+  <p><strong>Final Mark:</strong> {{ enrollment.final_mark|floatformat:2 }}%</p>
+
+{% empty %}
+  <p>No enrollments found.</p>
+{% endfor %}
+
+
+
+
+
