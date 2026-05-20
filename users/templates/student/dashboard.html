@@ -106,7 +106,7 @@
                 <tr>                   
                     <td>
                      {% if enrollment.course %}
-                    <a href="{% url 'course_detail.html' enrollment.course.id %}">
+                    <a href="{% url 'course_detail enrollment.course.id %}">
                     {{ enrollment.course }}
                     </a>
                         {% else %}
