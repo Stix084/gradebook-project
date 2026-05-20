@@ -13,5 +13,5 @@ urlpatterns = [
     path("", role_redirect, name="home"),
     path("dashboard/", student_dashboard, name="dashboard"),
     path("lecturer-dashboard/", lecturer_dashboard, name="lecturer_dashboard"),
-    path("course/<int:id>/", course_detail, name="course_detail"),
+    path("course/<int:id>/", course_detail, name="course_detail"),  
 ]
