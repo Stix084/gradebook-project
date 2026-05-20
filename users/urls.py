@@ -3,6 +3,7 @@ from django.urls import path, include
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from courses.models import Course
+from users.views import student_dashboard, course_detail
 
 from users.views import (
     course_detail,
@@ -27,4 +28,6 @@ urlpatterns = [
         name="lecturer_dashboard"
     ),
      path("course/<int:id>/", course_detail, name="course_detail"),
+
+     
 ]
