@@ -1,5 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from courses.models import Course
+from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+
 
 
 def role_redirect(request):
@@ -19,6 +24,18 @@ def student_dashboard(request):
     enrollments = request.user.enrollment_set.all()
 
     return render(request, "student/dashboard.html", {
+        "enrollments": enrollments
+    })
+
+@login_required
+def course_detail(request, id):
+
+    course = get_object_or_404(Course, id=id)
+
+    enrollments = request.user.enrollment_set.filter(course=course)
+
+    return render(request, "student/course_detail.html", {
+        "course": course,
         "enrollments": enrollments
     })
 

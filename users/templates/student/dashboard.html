@@ -4,32 +4,45 @@
     <title>Student Dashboard</title>
 
     <style>
-
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f6f9;
             margin: 0;
-            padding: 0;
+            background: #f4f6f9;
         }
 
         .header {
-            background-color: #1f3c88;
+            background: #1f3c88;
             color: white;
-            padding: 15px;
-            text-align: center;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header img {
+            height: 45px;
+            width: 45px;
+            border-radius: 50%;
+            background: white;
         }
 
         .container {
-            width: 80%;
+            width: 85%;
             margin: 30px auto;
         }
 
         .card {
             background: white;
             padding: 20px;
+            border-radius: 10px;
             margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
 
         table {
@@ -37,94 +50,88 @@
             border-collapse: collapse;
         }
 
-        table th,
-        table td {
+        th, td {
             padding: 12px;
             border-bottom: 1px solid #ddd;
             text-align: left;
         }
 
-        table th {
-            background-color: #f0f0f0;
+        th {
+            background: #f0f0f0;
         }
 
-        .logout-btn {
-            background-color: crimson;
+        .logout {
+            background: crimson;
             color: white;
-            border: none;
             padding: 10px 15px;
-            border-radius: 5px;
+            border: none;
+            border-radius: 6px;
             cursor: pointer;
         }
 
-        .logout-btn:hover {
+        .logout:hover {
             opacity: 0.9;
         }
-
     </style>
 </head>
 
 <body>
 
 <div class="header">
-    <h1>Student Dashboard</h1>
+    <img src="/static/images/school_logo.png" alt="Logo">
+    <h2>Student Academic Portal</h2>
 </div>
 
 <div class="container">
 
+    <!-- Student Info -->
     <div class="card">
-        <h2>Welcome {{ request.user.username }}</h2>
-
-        <p>
-            Student Number:
-            {{ request.user.student_number }}
-        </p>
+        <h3>Welcome, {{ request.user.username }}</h3>
+        <p><strong>Student Number:</strong> {{ request.user.student_number }}</p>
     </div>
 
-    <div class="card">
+    <div class="grid">
 
-        <h2>Your Enrollments</h2>
+        <!-- Enrollments -->
+        <div class="card">
+            <h3>My Courses</h3>
 
-        <table>
+            <table>
+                <tr>
+                    <th>Course</th>
+                    <th>Status</th>
+                    <th>Mark</th>
+                </tr>
 
-            <tr>
-                <th>Course</th>
-                <th>Status</th>
-                <th>Final Mark</th>
-            </tr>
+                {% for enrollment in enrollments %}
+                <tr>
+                    <td>
+                      <a href="{% url 'course_detail' enrollment.course.id %}">
+                          {{ enrollment.course }}
+                      </a>
+                    </td>>
+                    <td>{{ enrollment.status }}</td>
+                    <td>{{ enrollment.final_mark }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No courses enrolled yet.</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
 
-            {% for enrollment in enrollments %}
+        <!-- Actions -->
+        <div class="card">
+            <h3>Quick Actions</h3>
 
-            <tr>
-                <td>{{ enrollment.course }}</td>
-
-                <td>{{ enrollment.status }}</td>
-
-                <td>
-                    {{ enrollment.final_mark }}
-                </td>
-            </tr>
-
-            {% empty %}
-
-            <tr>
-                <td colspan="3">
-                    No enrollments found.
-                </td>
-            </tr>
-
-            {% endfor %}
-
-        </table>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button class="logout">Logout</button>
+            </form>
+        </div>
 
     </div>
-
-    <form method="post" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <button type="submit" class="logout-btn">
-            Logout
-        </button>
-    </form>
 
 </div>
 
