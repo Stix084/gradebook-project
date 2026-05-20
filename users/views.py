@@ -1,10 +1,14 @@
-from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+
 
 def role_redirect(request):
-    user = request.user
-    
-    if user.is_authenticated:
-        # Redirect all users to home temporarily
-        return redirect('home')
-    
-    return redirect('login')
+
+    if not request.user.is_authenticated:
+        return redirect("login")
+
+    if request.user.role == "LECTURER":
+        return redirect("lecturer_dashboard")
+
+    return redirect("dashboard")
+
