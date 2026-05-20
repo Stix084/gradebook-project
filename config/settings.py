@@ -143,7 +143,7 @@ LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "dashboard"
 LOGOUT_REDIRECT_URL = "login"
 
-# At the bottom of settings.py, add:
+
 
 # Security settings for production
 if not DEBUG:
