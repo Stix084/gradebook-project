@@ -1,9 +1,10 @@
 from django.shortcuts import redirect
 
-
 def role_redirect(request):
-
-    if not request.user.is_authenticated:
-        return redirect("login")
-
-    return redirect("dashboard")
+    user = request.user
+    
+    if user.is_authenticated:
+        # Redirect all users to home temporarily
+        return redirect('home')
+    
+    return redirect('login')
