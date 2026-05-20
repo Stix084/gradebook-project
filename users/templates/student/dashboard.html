@@ -105,11 +105,18 @@
 
                 {% for enrollment in enrollments %}
                 <tr>
+                    
                     <td>
-                      <a href="{% url 'course_detail' enrollment.course.id %}">
-                          {{ enrollment.course }}
-                      </a>
+                {% if enrollment.course %}
+                <a href="{% url 'course_detail' enrollment.course.id %}">
+                    {{ enrollment.course }}
+                </a>
+                        {% else %}
+                        <span style="color:red;">Missing Course</span>
+                        {% endif %}
                     </td>
+
+
                     <td>{{ enrollment.status }}</td>
                     <td>{{ enrollment.final_mark }}</td>
                 </tr>
