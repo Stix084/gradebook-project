@@ -125,6 +125,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field
@@ -135,8 +136,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "users.User"
 
 # Authentication redirects
-LOGIN_REDIRECT_URL = 'home'  # or 'student_grades' depending on your preference
-LOGOUT_REDIRECT_URL = 'home'  # Optional: where to redirect after logout
+#LOGIN_REDIRECT_URL = 'home'  # or 'student_grades' depending on your preference
+#LOGOUT_REDIRECT_URL = 'home'  # Optional: where to redirect after logout
+
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "dashboard"
+LOGOUT_REDIRECT_URL = "login"
 
 # At the bottom of settings.py, add:
 
@@ -147,3 +152,4 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
+
