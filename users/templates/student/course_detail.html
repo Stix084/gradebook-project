@@ -52,14 +52,18 @@
 
 <div class="container">
 
+    <!-- COURSE INFO -->
     <div class="card">
         <h3>Course Overview</h3>
         <p><strong>Code:</strong> {{ course.code }}</p>
         <p><strong>Description:</strong> {{ course.description }}</p>
     </div>
 
+    <!-- STUDENT PERFORMANCE -->
     <div class="card">
         <h3>Your Performance</h3>
+
+        {% if enrollment %}
 
         <table>
             <tr>
@@ -67,17 +71,15 @@
                 <th>Final Mark</th>
             </tr>
 
-            {% for e in enrollments %}
             <tr>
-                <td>{{ e.status }}</td>
-                <td>{{ e.final_mark }}</td>
+                <td>{{ enrollment.status }}</td>
+                <td>{{ enrollment.final_mark }}</td>
             </tr>
-            {% empty %}
-            <tr>
-                <td colspan="2">No data available</td>
-            </tr>
-            {% endfor %}
         </table>
+
+        {% else %}
+            <p style="color:red;">You are not enrolled in this course.</p>
+        {% endif %}
 
     </div>
 

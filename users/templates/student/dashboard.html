@@ -3,6 +3,8 @@
 <head>
     <title>Student Dashboard</title>
 
+    {% load static %}
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -78,7 +80,7 @@
 <body>
 
 <div class="header">
-    <img src="/static/images/school_logo.png" alt="Logo">
+    <img src="{% static 'images/school_logo.png' %}" alt="Logo">
     <h2>Student Academic Portal</h2>
 </div>
 
@@ -102,25 +104,36 @@
                     <th>Status</th>
                     <th>Mark</th>
                 </tr>
+
                 {% for enrollment in enrollments %}
-                <tr>                   
+                <tr>
+
+                    <!-- Course Link -->
                     <td>
-                     {% if enrollment.course %}
-                     <a href="{% url 'course_detail' enrollment.course.id %}">
+                        {% if enrollment.course %}
+                            <a href="{% url 'course_detail' enrollment.course.id %}">
                                 {{ enrollment.course }}
-                     </a>
+                            </a>
                         {% else %}
-                        <span style="color:red;">Missing Course</span>
+                            <span style="color:red;">Invalid Course</span>
                         {% endif %}
                     </td>
+
                     <td>{{ enrollment.status }}</td>
-                    <td>{{ enrollment.final_mark }}</td>
+
+                    <!-- Final Mark -->
+                    <td>
+                        {{ enrollment.final_mark }}
+                    </td>
+
                 </tr>
+
                 {% empty %}
                 <tr>
                     <td colspan="3">No courses enrolled yet.</td>
                 </tr>
                 {% endfor %}
+
             </table>
         </div>
 
@@ -130,7 +143,7 @@
 
             <form method="post" action="{% url 'logout' %}">
                 {% csrf_token %}
-                <button class="logout">Logout</button>
+                <button type="submit" class="logout">Logout</button>
             </form>
         </div>
 

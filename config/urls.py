@@ -1,25 +1,33 @@
 from django.contrib import admin
 from django.urls import path, include
-from django.shortcuts import redirect
-
-from users.views import student_dashboard  # keep only this for now
-
-
-def home_redirect(request):
-    if not request.user.is_authenticated:
-        return redirect("login")
-    return redirect("dashboard")
-
+from users.views import (
+    role_redirect,
+    student_dashboard,
+    lecturer_dashboard,
+    course_detail
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-
-    # auth system (Django built-in)
     path("accounts/", include("django.contrib.auth.urls")),
 
-    # landing page
-    path("", home_redirect, name="home"),
+    path("", role_redirect, name="home"),
 
-    # main student dashboard
     path("dashboard/", student_dashboard, name="dashboard"),
+
+    path("lecturer-dashboard/", lecturer_dashboard, name="lecturer_dashboard"),
+
+    path("course/<int:id>/", course_detail, name="course_detail"),
 ]
+
+
+from django.shortcuts import redirect
+
+def role_redirect(request):
+    if not request.user.is_authenticated:
+        return redirect("login")
+
+    if request.user.role == "STUDENT":
+        return redirect("dashboard")
+
+    return redirect("lecturer_dashboard")
