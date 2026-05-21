@@ -172,5 +172,75 @@ class Grade(models.Model):
     
 
     #-------------------------------------------------------------------------
+class Assessment(models.Model):
+    ASSESSMENT_TYPES = (
+        ("ASSIGNMENT", "Assignment"),
+        ("TEST", "Test"),
+        ("EXAM", "Exam"),
+    )
+
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name="assessments"
+    )
+
+    title = models.CharField(max_length=100)
+
+    assessment_type = models.CharField(
+        max_length=20,
+        choices=ASSESSMENT_TYPES
+    )
+
+    total_marks = models.FloatField(default=100)
+
+    weight = models.FloatField(
+        help_text="Contribution percentage to final mark"
+    )
+
+    due_date = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.course.code} - {self.title}"
+
+
+class AssessmentGrade(models.Model):
+    student = models.ForeignKey(
+        "users.User",
+        on_delete=models.CASCADE
+    )
+
+    assessment = models.ForeignKey(
+        Assessment,
+        on_delete=models.CASCADE,
+        related_name="grades"
+    )
+
+    marks_obtained = models.FloatField()
+
+    feedback = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    graded_at = models.DateTimeField(auto_now_add=True)
+
+    def percentage(self):
+        return (
+            self.marks_obtained /
+            self.assessment.total_marks
+        ) * 100
+
+    def weighted_score(self):
+        return (
+            self.percentage() *
+            self.assessment.weight
+        ) / 100
+
+    def __str__(self):
+        return (
+            f"{self.student.username} - "
+            f"{self.assessment.title}"
+        )
 
 

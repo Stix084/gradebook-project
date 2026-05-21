@@ -1,3 +1,8 @@
+
+from django.contrib import admin
+from .models import Course, Assessment, Grade
+
+
 from django.contrib import admin
 from .models import (
     Course,
@@ -39,4 +44,6 @@ class GradeAdmin(admin.ModelAdmin):
         queryset.update(is_locked=True)
 
     lock_grades.short_description = "Lock selected grades"
+
+
 
