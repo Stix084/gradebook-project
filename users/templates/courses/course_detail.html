@@ -1,0 +1,14 @@
+<h2>{{ course.name }}</h2>
+
+<p><strong>Description:</strong> {{ course.description }}</p>
+
+<hr>
+
+<h3>Your Status</h3>
+
+{% if enrollment %}
+    <p>Status: {{ enrollment.status }}</p>
+    <p>Final Mark: {{ enrollment.final_mark }}</p>
+{% else %}
+    <p style="color:red;">You are not enrolled in this course.</p>
+{% endif %}

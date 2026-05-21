@@ -106,9 +106,9 @@
                 <tr>                   
                     <td>
                      {% if enrollment.course %}
-                    <a href="{% url 'course_detail' enrollment.course.id %}">
-                    {{ enrollment.course }}
-                    </a>
+                     <a href="{% url 'course_detail' enrollment.course.id %}">
+                                {{ enrollment.course }}
+                     </a>
                         {% else %}
                         <span style="color:red;">Missing Course</span>
                         {% endif %}
