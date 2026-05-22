@@ -43,3 +43,18 @@ class Enrollment(models.Model):
 
     def __str__(self):
         return f"{self.student} → {self.course}"
+
+        def final_mark(self):
+    from courses.models import Grade
+    grades = Grade.objects.filter(
+        student=self.student,
+        assessment__course=self.course
+    ).select_related("assessment")
+    
+    total = 0
+    for g in grades:
+        if g.assessment.total_marks > 0:
+            ratio = g.marks_obtained / g.assessment.total_marks
+            total += ratio * g.assessment.weight
+    
+    return round(total, 1)
