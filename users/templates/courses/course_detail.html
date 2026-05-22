@@ -1,14 +1,33 @@
-<h2>{{ course.name }}</h2>
+@login_required
+def course_detail(request, id):
+    course = get_object_or_404(Course, id=id)
 
-<p><strong>Description:</strong> {{ course.description }}</p>
+    enrollment = Enrollment.objects.filter(
+        student=request.user,
+        course=course
+    ).first()
 
-<hr>
+    assessments = course.assessments.all()
 
-<h3>Your Status</h3>
+    grades = Grade.objects.filter(
+        student=request.user,
+        assessment__course=course
+    ).select_related("assessment")
 
-{% if enrollment %}
-    <p>Status: {{ enrollment.status }}</p>
-    <p>Final Mark: {{ enrollment.final_mark }}</p>
-{% else %}
-    <p style="color:red;">You are not enrolled in this course.</p>
-{% endif %}
+    # -----------------------------
+    # Weighted final score
+    # -----------------------------
+    final_score = 0
+
+    for g in grades:
+        if g.assessment.total_marks > 0:
+            ratio = g.marks_obtained / g.assessment.total_marks
+            final_score += ratio * g.assessment.weight
+
+    return render(request, "courses/course_detail.html", {
+        "course": course,
+        "enrollment": enrollment,
+        "assessments": assessments,
+        "grades": grades,
+        "final_score": final_score
+    })

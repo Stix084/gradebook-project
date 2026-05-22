@@ -1,0 +1,24 @@
+<h2>{{ course.name }} - Grade Summary</h2>
+
+<table border="1">
+    <tr>
+        <th>Student</th>
+        <th>Final Score</th>
+        <th>Status</th>
+    </tr>
+
+    {% for item in summary_data %}
+    <tr>
+        <td>{{ item.student.username }}</td>
+        <td>{{ item.final_score|floatformat:2 }}</td>
+
+        <td>
+            {% if item.status == "PASS" %}
+                <span style="color:green;">PASS</span>
+            {% else %}
+                <span style="color:red;">FAIL</span>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>

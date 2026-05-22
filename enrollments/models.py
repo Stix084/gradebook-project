@@ -1,5 +1,4 @@
 from django.db import models
-from courses.models import Course
 from users.models import User
 
 
@@ -21,7 +20,7 @@ class Enrollment(models.Model):
     )
 
     course = models.ForeignKey(
-        Course,
+        "courses.Course",
         on_delete=models.CASCADE
     )
 
@@ -36,8 +35,7 @@ class Enrollment(models.Model):
     )
 
     is_locked = models.BooleanField(
-        default=False,
-        help_text="Locks final mark and prevents further grade changes"
+        default=False
     )
 
     class Meta:
@@ -45,6 +43,3 @@ class Enrollment(models.Model):
 
     def __str__(self):
         return f"{self.student} → {self.course}"
-
-    def final_mark(self):
-        return self.course.calculate_final_mark(self)

@@ -59,28 +59,41 @@
         <p><strong>Description:</strong> {{ course.description }}</p>
     </div>
 
-    <!-- STUDENT PERFORMANCE -->
+    <!-- ACADEMIC PERFORMANCE -->
     <div class="card">
-        <h3>Your Performance</h3>
+        <h3>Grade Summary</h3>
 
-        {% if enrollment %}
+        <p><strong>Final Score:</strong> {{ final_score|floatformat:2 }}</p>
+
+        <p>
+            <strong>Status:</strong>
+            {% if status == "PASS" %}
+                <span style="color:green;">{{ status }}</span>
+            {% else %}
+                <span style="color:red;">{{ status }}</span>
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- BREAKDOWN -->
+    <div class="card">
+        <h3>Assessment Breakdown</h3>
 
         <table>
             <tr>
-                <th>Status</th>
-                <th>Final Mark</th>
+                <th>Assessment</th>
+                <th>Score</th>
+                <th>Weight</th>
             </tr>
 
+            {% for g in grades %}
             <tr>
-                <td>{{ enrollment.status }}</td>
-                <td>{{ enrollment.final_mark }}</td>
+                <td>{{ g.assessment.title }}</td>
+                <td>{{ g.marks_obtained }}/{{ g.assessment.total_marks }}</td>
+                <td>{{ g.assessment.weight }}%</td>
             </tr>
+            {% endfor %}
         </table>
-
-        {% else %}
-            <p style="color:red;">You are not enrolled in this course.</p>
-        {% endif %}
-
     </div>
 
 </div>

@@ -1,49 +1,28 @@
-
 from django.contrib import admin
 from .models import Course, Assessment, Grade
 
 
-from django.contrib import admin
-from .models import (
-    Course,
-    AssessmentComponent,
-    AssessmentItem,
-    Grade
-)
-
-
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ("code", "name", "lecturer", "academic_year")
+    list_display = ("code", "name")
     search_fields = ("code", "name")
 
 
-@admin.register(AssessmentComponent)
-class AssessmentComponentAdmin(admin.ModelAdmin):
-    list_display = ("course", "name", "weight")
-
-
-@admin.register(AssessmentItem)
-class AssessmentItemAdmin(admin.ModelAdmin):
-    list_display = ("name", "component", "max_score")
+@admin.register(Assessment)
+class AssessmentAdmin(admin.ModelAdmin):
+    list_display = ("course", "title", "total_marks", "weight")
+    list_filter = ("course",)
+    search_fields = ("title",)
 
 
 @admin.register(Grade)
 class GradeAdmin(admin.ModelAdmin):
-    list_display = (
-        "enrollment",
-        "assessment_item",
-        "score",
-        "is_locked",
-    )
-    list_filter = ("is_locked", "assessment_item")
+    list_display = ("student", "assessment", "marks_obtained")
+    list_filter = ("assessment",)
 
-    actions = ["lock_grades"]
+    actions = ["reset_grades"]
 
-    def lock_grades(self, request, queryset):
-        queryset.update(is_locked=True)
+    def reset_grades(self, request, queryset):
+        queryset.update(marks_obtained=0)
 
-    lock_grades.short_description = "Lock selected grades"
-
-
-
+    reset_grades.short_description = "Reset selected grades"

@@ -1,14 +1,31 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Lecturer Dashboard</title>
-</head>
+<h2>Lecturer Dashboard</h2>
 
-<body>
+<p>Welcome, {{ request.user.username }}</p>
 
-<h1>Lecturer Dashboard</h1>
+<hr>
 
-<p>Temporary placeholder page.</p>
+<h3>Your Courses</h3>
 
-</body>
-</html>
+<table border="1">
+  <tr>
+    <th>Course Code</th>
+    <th>Course Name</th>
+    <th>Action</th>
+  </tr>
+
+  {% for course in courses %}
+  <tr>
+    <td>{{ course.code }}</td>
+    <td>{{ course.name }}</td>
+    <td>
+      <a href="{% url 'enter_grades' course.id %}">
+        Enter Grades
+      </a>
+    </td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="3">No courses assigned.</td>
+  </tr>
+  {% endfor %}
+</table>

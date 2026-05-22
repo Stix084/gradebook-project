@@ -1,37 +1,39 @@
-from django.shortcuts import render
-
-# Create your views here.
-
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from users.decorators import lecturer_required
 from enrollments.models import Enrollment
-from courses.models import AssessmentItem, Grade
+
+from users.models import User
+
 
 @lecturer_required
 def enter_grades(request, course_id):
+
+    course = get_object_or_404(Course, id=course_id)
+
+    # all active students in this course
     enrollments = Enrollment.objects.filter(
-        course_id=course_id,
+        course=course,
         status="ACTIVE"
     ).select_related("student")
 
-    assessment_items = AssessmentItem.objects.filter(
-        component__course_id=course_id
-    )
+    students = [e.student for e in enrollments]
+
+    assessments = course.assessments.all()
 
     if request.method == "POST":
-        for enrollment in enrollments:
-            for item in assessment_items:
-                field_name = f"grade_{enrollment.id}_{item.id}"
+        for student in students:
+            for assessment in assessments:
+
+                field_name = f"grade_{student.id}_{assessment.id}"
                 score = request.POST.get(field_name)
 
-                if score is not None and score != "":
+                if score not in [None, ""]:
                     Grade.objects.update_or_create(
-                        enrollment=enrollment,
-                        assessment_item=item,
+                        student=student,
+                        assessment=assessment,
                         defaults={
-                            "score": score,
-                            "max_score": item.max_score
+                            "marks_obtained": score
                         }
                     )
 
@@ -39,8 +41,9 @@ def enter_grades(request, course_id):
         return redirect(request.path)
 
     context = {
-        "enrollments": enrollments,
-        "assessment_items": assessment_items,
+        "course": course,
+        "students": students,
+        "assessments": assessments,
     }
-    return render(request, "courses/enter_grades.html", context)
 
+    return render(request, "courses/enter_grades.html", context)

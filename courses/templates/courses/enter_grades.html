@@ -7,22 +7,23 @@
     <thead>
       <tr>
         <th>Student</th>
-        {% for item in assessment_items %}
-          <th>{{ item.name }}</th>
+        {% for assessment in assessments %}
+          <th>{{ assessment.title }}</th>
         {% endfor %}
       </tr>
     </thead>
 
     <tbody>
-      {% for enrollment in enrollments %}
+      {% for student in students %}
         <tr>
-          <td>{{ enrollment.student }}</td>
-          {% for item in assessment_items %}
+          <td>{{ student.username }}</td>
+
+          {% for assessment in assessments %}
             <td>
               <input
                 type="number"
                 step="0.01"
-                name="grade_{{ enrollment.id }}_{{ item.id }}"
+                name="grade_{{ student.id }}_{{ assessment.id }}"
               >
             </td>
           {% endfor %}
