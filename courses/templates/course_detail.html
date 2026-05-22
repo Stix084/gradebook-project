@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ course.code }} - {{ course.name }}</title>
+</head>
+<body>
+    <h1>{{ course.code }} - {{ course.name }}</h1>
+
+    {% if enrollment %}
+        <p>Status: Enrolled</p>
+    {% else %}
+        <p>You are not enrolled in this course.</p>
+    {% endif %}
+
+    <h2>Assessments</h2>
+    {% for assessment in assessments %}
+        <p>{{ assessment.title }} — {{ assessment.total_marks }} marks ({{ assessment.weight }}%)</p>
+    {% empty %}
+        <p>No assessments yet.</p>
+    {% endfor %}
+
+    <h2>Your Grades</h2>
+    {% for grade in grades %}
+        <p>{{ grade.assessment.title }}: {{ grade.marks_obtained }} / {{ grade.assessment.total_marks }}</p>
+    {% empty %}
+        <p>No grades recorded yet.</p>
+    {% endfor %}
+
+    <h2>Final Score: {{ final_score|floatformat:1 }}%</h2>
+</body>
+</html>
