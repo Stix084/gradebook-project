@@ -57,4 +57,4 @@ class Enrollment(models.Model):
             ratio = g.marks_obtained / g.assessment.total_marks
             total += ratio * g.assessment.weight
     
-    return round(total, 1)
+        return round(total, 1)
