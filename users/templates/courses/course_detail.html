@@ -1,33 +1,67 @@
-@login_required
-def course_detail(request, id):
-    course = get_object_or_404(Course, id=id)
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ course.code }} - {{ course.name }}</title>
+    {% load static %}
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f6f9; }
+        .header { background: #1f3c88; color: white; padding: 20px; display: flex; align-items: center; gap: 15px; }
+        .header img { height: 45px; width: 45px; border-radius: 50%; background: white; }
+        .container { width: 85%; margin: 30px auto; }
+        .card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
+        th { background: #f0f0f0; }
+        .back { display: inline-block; margin-bottom: 20px; color: #1f3c88; text-decoration: none; font-weight: bold; }
+        .score { font-size: 1.5em; font-weight: bold; color: #1f3c88; }
+    </style>
+</head>
+<body>
+<div class="header">
+    <img src="{% static 'images/school_logo.png' %}" alt="Logo">
+    <h2>Student Academic Portal</h2>
+</div>
+<div class="container">
+    <a class="back" href="{% url 'dashboard' %}">← Back to Dashboard</a>
 
-    enrollment = Enrollment.objects.filter(
-        student=request.user,
-        course=course
-    ).first()
+    <div class="card">
+        <h2>{{ course.code }} - {{ course.name }}</h2>
+        <p>Enrollment Status: <strong>{{ enrollment.status|default:"Not Enrolled" }}</strong></p>
+    </div>
 
-    assessments = course.assessments.all()
+    <div class="card">
+        <h3>Assessments & Grades</h3>
+        <table>
+            <tr>
+                <th>Assessment</th>
+                <th>Total Marks</th>
+                <th>Weight</th>
+                <th>Your Mark</th>
+            </tr>
+            {% for assessment in assessments %}
+            <tr>
+                <td>{{ assessment.title }}</td>
+                <td>{{ assessment.total_marks }}</td>
+                <td>{{ assessment.weight }}%</td>
+                <td>
+                    {% for grade in grades %}
+                        {% if grade.assessment.id == assessment.id %}
+                            {{ grade.marks_obtained }}
+                        {% endif %}
+                    {% empty %}
+                        —
+                    {% endfor %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4">No assessments yet.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
 
-    grades = Grade.objects.filter(
-        student=request.user,
-        assessment__course=course
-    ).select_related("assessment")
-
-    # -----------------------------
-    # Weighted final score
-    # -----------------------------
-    final_score = 0
-
-    for g in grades:
-        if g.assessment.total_marks > 0:
-            ratio = g.marks_obtained / g.assessment.total_marks
-            final_score += ratio * g.assessment.weight
-
-    return render(request, "courses/course_detail.html", {
-        "course": course,
-        "enrollment": enrollment,
-        "assessments": assessments,
-        "grades": grades,
-        "final_score": final_score
-    })
+    <div class="card">
+        <p>Weighted Final Score: <span class="score">{{ final_score|floatformat:1 }}%</span></p>
+    </div>
+</div>
+</body>
+</html>
