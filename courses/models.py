@@ -46,9 +46,7 @@ class Grade(models.Model):
 
     assessment = models.ForeignKey(
         Assessment,
-        on_delete=models.CASCADE,
-        null=True,  # Temporarily allow null
-        blank=True  # Temporarily allow blank
+        on_delete=models.CASCADE
     )
 
     marks_obtained = models.FloatField()
