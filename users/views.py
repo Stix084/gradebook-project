@@ -126,3 +126,68 @@ def course_detail(request, id):
         "grades": grades,
         "final_score": final_score
     })
+import openpyxl
+from django.http import HttpResponse
+
+@login_required
+def export_course_summary(request, id):
+    course = get_object_or_404(Course, id=id, lecturer=request.user)
+    enrollments = Enrollment.objects.filter(
+        course=course
+    ).select_related("student")
+
+    assessments = list(course.assessments.all())
+    non_assignments = [a for a in assessments if a.assessment_type != "ASSIGNMENT"]
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = course.code
+
+    # Header row
+    headers = ["Student Number", "First Name", "Last Name"]
+    for a in non_assignments:
+        headers.append(a.title)
+    headers += ["Assignments (avg)", "Final Mark"]
+    ws.append(headers)
+
+    # Data rows
+    for enrollment in enrollments:
+        student = enrollment.student
+        grades = Grade.objects.filter(
+            student=student,
+            assessment__course=course
+        ).select_related("assessment")
+
+        grade_map = {g.assessment_id: g for g in grades}
+
+        row = [
+            student.student_number or "",
+            student.first_name,
+            student.last_name,
+        ]
+
+        for a in non_assignments:
+            g = grade_map.get(a.id)
+            row.append(g.marks_obtained if g else "-")
+
+        assignment_grades = [
+            g for g in grades if g.assessment.assessment_type == "ASSIGNMENT"
+        ]
+        if assignment_grades:
+            total_obtained = sum(g.marks_obtained for g in assignment_grades)
+            total_possible = sum(g.assessment.total_marks for g in assignment_grades)
+            avg = round((total_obtained / total_possible) * 100, 1) if total_possible > 0 else "-"
+        else:
+            avg = "-"
+
+        row.append(avg)
+        row.append(enrollment.final_mark())
+        ws.append(row)
+
+    # Return as download
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response["Content-Disposition"] = f'attachment; filename="{course.code}_grade_summary.xlsx"'
+    wb.save(response)
+    return response

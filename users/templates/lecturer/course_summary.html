@@ -14,6 +14,8 @@
         th { background: #1f3c88; color: white; }
         tr:hover { background: #f9f9f9; }
         .back { display: inline-block; margin-bottom: 20px; color: #1f3c88; text-decoration: none; font-weight: bold; }
+        .export-btn { display: inline-block; margin-bottom: 20px; margin-left: 20px; background: #1f3c88; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; }
+        .export-btn:hover { opacity: 0.9; }
     </style>
 </head>
 <body>
@@ -23,12 +25,15 @@
 </div>
 <div class="container">
     <a class="back" href="{% url 'lecturer_dashboard' %}">← Back to Dashboard</a>
+    <a class="export-btn" href="{% url 'export_course_summary' course.id %}">⬇ Export to Excel</a>
     <div class="card">
         <h2>{{ course.code }} - {{ course.name }}</h2>
         <h3>Grade Summary</h3>
         <table>
             <tr>
-                <th>Student</th>
+                <th>Student Number</th>
+                <th>First Name</th>
+                <th>Last Name</th>
                 {% for a in non_assignments %}
                     <th>{{ a.title }}</th>
                 {% endfor %}
@@ -37,7 +42,9 @@
             </tr>
             {% for row in rows %}
             <tr>
-                <td>{{ row.student.username }}</td>
+                <td>{{ row.student.student_number }}</td>
+                <td>{{ row.student.first_name }}</td>
+                <td>{{ row.student.last_name }}</td>
                 {% for mark in row.non_assignment_marks %}
                     <td>{{ mark }}</td>
                 {% endfor %}
