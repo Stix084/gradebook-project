@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
-from courses.models import Course, Grade
+from courses.models import Course, Grade, Assessment
 from enrollments.models import Enrollment
 
 
@@ -24,7 +24,66 @@ def student_dashboard(request):
 
 @login_required
 def lecturer_dashboard(request):
-    return render(request, "lecturer/dashboard.html")
+    courses = Course.objects.filter(lecturer=request.user)
+    return render(request, "lecturer/dashboard.html", {
+        "courses": courses
+    })
+
+
+@login_required
+def lecturer_course_summary(request, id):
+    course = get_object_or_404(Course, id=id, lecturer=request.user)
+    enrollments = Enrollment.objects.filter(
+        course=course
+    ).select_related("student")
+
+    assessments = list(course.assessments.all())
+    non_assignments = [a for a in assessments if a.assessment_type != "ASSIGNMENT"]
+
+    rows = []
+    for enrollment in enrollments:
+        student = enrollment.student
+        grades = Grade.objects.filter(
+            student=student,
+            assessment__course=course
+        ).select_related("assessment")
+
+        grade_map = {g.assessment_id: g for g in grades}
+
+        # Non-assignment marks
+        non_assignment_marks = []
+        for a in non_assignments:
+            g = grade_map.get(a.id)
+            non_assignment_marks.append(
+                round(g.marks_obtained, 1) if g else "-"
+            )
+
+        # Assignment average
+        assignment_grades = [
+            g for g in grades if g.assessment.assessment_type == "ASSIGNMENT"
+        ]
+        if assignment_grades:
+            total_obtained = sum(g.marks_obtained for g in assignment_grades)
+            total_possible = sum(g.assessment.total_marks for g in assignment_grades)
+            avg = round((total_obtained / total_possible) * 100, 1) if total_possible > 0 else "-"
+        else:
+            avg = "-"
+
+        # Final mark
+        final = enrollment.final_mark()
+
+        rows.append({
+            "student": student,
+            "non_assignment_marks": non_assignment_marks,
+            "assignment_avg": avg,
+            "final_mark": final,
+        })
+
+    return render(request, "lecturer/course_summary.html", {
+        "course": course,
+        "non_assignments": non_assignments,
+        "rows": rows,
+    })
 
 
 @login_required

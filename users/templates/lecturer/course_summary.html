@@ -1,24 +1,54 @@
-<h2>{{ course.name }} - Grade Summary</h2>
-
-<table border="1">
-    <tr>
-        <th>Student</th>
-        <th>Final Score</th>
-        <th>Status</th>
-    </tr>
-
-    {% for item in summary_data %}
-    <tr>
-        <td>{{ item.student.username }}</td>
-        <td>{{ item.final_score|floatformat:2 }}</td>
-
-        <td>
-            {% if item.status == "PASS" %}
-                <span style="color:green;">PASS</span>
-            {% else %}
-                <span style="color:red;">FAIL</span>
-            {% endif %}
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ course.code }} - Grade Summary</title>
+    {% load static %}
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f6f9; }
+        .header { background: #1f3c88; color: white; padding: 20px; display: flex; align-items: center; gap: 15px; }
+        .header img { height: 45px; width: 45px; border-radius: 50%; background: white; }
+        .container { width: 90%; margin: 30px auto; }
+        .card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
+        th { background: #1f3c88; color: white; }
+        tr:hover { background: #f9f9f9; }
+        .back { display: inline-block; margin-bottom: 20px; color: #1f3c88; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+<div class="header">
+    <img src="{% static 'images/school_logo.png' %}" alt="Logo">
+    <h2>Lecturer Portal</h2>
+</div>
+<div class="container">
+    <a class="back" href="{% url 'lecturer_dashboard' %}">← Back to Dashboard</a>
+    <div class="card">
+        <h2>{{ course.code }} - {{ course.name }}</h2>
+        <h3>Grade Summary</h3>
+        <table>
+            <tr>
+                <th>Student</th>
+                {% for a in non_assignments %}
+                    <th>{{ a.title }}</th>
+                {% endfor %}
+                <th>Assignments (avg)</th>
+                <th>Final Mark</th>
+            </tr>
+            {% for row in rows %}
+            <tr>
+                <td>{{ row.student.username }}</td>
+                {% for mark in row.non_assignment_marks %}
+                    <td>{{ mark }}</td>
+                {% endfor %}
+                <td>{{ row.assignment_avg }}%</td>
+                <td>{{ row.final_mark }}%</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="100">No students enrolled.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+</body>
+</html>
