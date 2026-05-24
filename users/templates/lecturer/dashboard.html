@@ -1,31 +1,56 @@
-<h2>Lecturer Dashboard</h2>
-
-<p>Welcome, {{ request.user.username }}</p>
-
-<hr>
-
-<h3>Your Courses</h3>
-
-<table border="1">
-  <tr>
-    <th>Course Code</th>
-    <th>Course Name</th>
-    <th>Action</th>
-  </tr>
-
-  {% for course in courses %}
-  <tr>
-    <td>{{ course.code }}</td>
-    <td>{{ course.name }}</td>
-    <td>
-      <a href="{% url 'enter_grades' course.id %}">
-        Enter Grades
-      </a>
-    </td>
-  </tr>
-  {% empty %}
-  <tr>
-    <td colspan="3">No courses assigned.</td>
-  </tr>
-  {% endfor %}
-</table>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lecturer Dashboard</title>
+    {% load static %}
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f6f9; }
+        .header { background: #1f3c88; color: white; padding: 20px; display: flex; align-items: center; gap: 15px; }
+        .header img { height: 45px; width: 45px; border-radius: 50%; background: white; }
+        .container { width: 85%; margin: 30px auto; }
+        .card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
+        th { background: #f0f0f0; }
+        a { color: #1f3c88; text-decoration: none; font-weight: bold; }
+        a:hover { text-decoration: underline; }
+        .logout { background: crimson; color: white; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; }
+    </style>
+</head>
+<body>
+<div class="header">
+    <img src="{% static 'images/school_logo.png' %}" alt="Logo">
+    <h2>Lecturer Portal</h2>
+</div>
+<div class="container">
+    <div class="card">
+        <h3>Welcome, {{ request.user.username }}</h3>
+    </div>
+    <div class="card">
+        <h3>My Courses</h3>
+        <table>
+            <tr>
+                <th>Code</th>
+                <th>Course</th>
+                <th>Summary</th>
+            </tr>
+            {% for course in courses %}
+            <tr>
+                <td>{{ course.code }}</td>
+                <td>{{ course.name }}</td>
+                <td><a href="{% url 'lecturer_course_summary' course.id %}">View Summary</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3">No courses assigned yet.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="card">
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="logout">Logout</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
