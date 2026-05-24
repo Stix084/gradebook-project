@@ -1,20 +1,21 @@
 from django.db import models
 
 
-# ---------------------------------
-# COURSE MODEL
-# ---------------------------------
 class Course(models.Model):
     name = models.CharField(max_length=200)
     code = models.CharField(max_length=20)
+    lecturer = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="courses"
+    )
 
     def __str__(self):
         return f"{self.code} - {self.name}"
 
 
-# ---------------------------------
-# ASSESSMENT MODEL
-# ---------------------------------
 class Assessment(models.Model):
     QUIZ = "QUIZ"
     ASSIGNMENT = "ASSIGNMENT"
@@ -51,20 +52,15 @@ class Assessment(models.Model):
         return f"{self.course.code} - {self.title}"
 
 
-# ---------------------------------
-# GRADE MODEL
-# ---------------------------------
 class Grade(models.Model):
     student = models.ForeignKey(
         "users.User",
         on_delete=models.CASCADE
     )
-
     assessment = models.ForeignKey(
         Assessment,
         on_delete=models.CASCADE
     )
-
     marks_obtained = models.FloatField()
 
     class Meta:
