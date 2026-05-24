@@ -12,8 +12,12 @@ def role_redirect(request):
     return redirect("lecturer_dashboard")
 
 
+
 @login_required
 def student_dashboard(request):
+    if request.user.role != "STUDENT":
+        return redirect("lecturer_dashboard")
+    
     enrollments = Enrollment.objects.filter(
         student=request.user
     ).select_related("course")
