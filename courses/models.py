@@ -68,3 +68,26 @@ class Grade(models.Model):
 
     def __str__(self):
         return f"{self.student} - {self.assessment}"
+
+
+class ClassLog(models.Model):
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name="class_logs"
+    )
+    lecturer = models.ForeignKey(
+        "users.User",
+        on_delete=models.CASCADE,
+        related_name="class_logs"
+    )
+    date = models.DateField()
+    topic = models.CharField(max_length=200)
+    notes = models.TextField(blank=True, null=True)
+    logged_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-date"]
+
+    def __str__(self):
+        return f"{self.course.code} - {self.topic} ({self.date})"

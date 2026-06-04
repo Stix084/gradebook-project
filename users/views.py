@@ -2,6 +2,34 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
 from courses.models import Course, Grade, Assessment
 from enrollments.models import Enrollment
+from courses.models import Course, Grade, Assessment, ClassLog
+from django.utils.dateparse import parse_date
+
+
+@login_required
+def class_log(request, id):
+    course = get_object_or_404(Course, id=id, lecturer=request.user)
+    
+    if request.method == "POST":
+        date = request.POST.get("date")
+        topic = request.POST.get("topic")
+        notes = request.POST.get("notes", "")
+        
+        if date and topic:
+            ClassLog.objects.create(
+                course=course,
+                lecturer=request.user,
+                date=parse_date(date),
+                topic=topic,
+                notes=notes
+            )
+    
+    logs = ClassLog.objects.filter(course=course).order_by("-date")
+    
+    return render(request, "lecturer/class_log.html", {
+        "course": course,
+        "logs": logs,
+    })
 
 
 def role_redirect(request):
@@ -191,3 +219,6 @@ def export_course_summary(request, id):
     response["Content-Disposition"] = f'attachment; filename="{course.code}_grade_summary.xlsx"'
     wb.save(response)
     return response
+
+
+    

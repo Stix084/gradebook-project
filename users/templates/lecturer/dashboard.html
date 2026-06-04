@@ -33,6 +33,11 @@
                 <th>Code</th>
                 <th>Course</th>
                 <th>Summary</th>
+                <th>Class Log</th>
+                <tr>
+    
+    
+</tr>
             </tr>
             {% for course in courses %}
             <tr>
@@ -40,6 +45,15 @@
                 <td>{{ course.name }}</td>
                 <td><a href="{% url 'lecturer_course_summary' course.id %}">View Summary</a></td>
             </tr>
+
+            <tr>
+                <td>{{ course.code }}</td>
+                <td>{{ course.name }}</td>
+                <td><a href="{% url 'lecturer_course_summary' course.id %}">View Grades</a></td>
+                <td><a href="{% url 'class_log' course.id %}">Class Log</a></td>
+            </tr>
+
+
             {% empty %}
             <tr><td colspan="3">No courses assigned yet.</td></tr>
             {% endfor %}
