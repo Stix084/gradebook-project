@@ -82,6 +82,12 @@ class ClassLog(models.Model):
         related_name="class_logs"
     )
     date = models.DateField()
+    start_time = models.TimeField()
+    duration = models.DecimalField(
+        max_digits=4,
+        decimal_places=1,
+        help_text="Duration in hours e.g. 1.5"
+    )
     topic = models.CharField(max_length=200)
     notes = models.TextField(blank=True, null=True)
     logged_at = models.DateTimeField(auto_now_add=True)

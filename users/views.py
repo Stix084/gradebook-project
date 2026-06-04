@@ -6,30 +6,59 @@ from courses.models import Course, Grade, Assessment, ClassLog
 from django.utils.dateparse import parse_date
 
 
+
 @login_required
 def class_log(request, id):
     course = get_object_or_404(Course, id=id, lecturer=request.user)
-    
-    if request.method == "POST":
+
+    # Handle new log
+    if request.method == "POST" and "log_class" in request.POST:
         date = request.POST.get("date")
+        start_time = request.POST.get("start_time")
+        duration = request.POST.get("duration")
         topic = request.POST.get("topic")
         notes = request.POST.get("notes", "")
-        
-        if date and topic:
+
+        if date and topic and start_time and duration:
             ClassLog.objects.create(
                 course=course,
                 lecturer=request.user,
                 date=parse_date(date),
+                start_time=start_time,
+                duration=duration,
                 topic=topic,
                 notes=notes
             )
-    
+
+    # Handle edit
+    if request.method == "POST" and "edit_log" in request.POST:
+        log_id = request.POST.get("log_id")
+        log = get_object_or_404(ClassLog, id=log_id, lecturer=request.user)
+        log.date = parse_date(request.POST.get("date"))
+        log.start_time = request.POST.get("start_time")
+        log.duration = request.POST.get("duration")
+        log.topic = request.POST.get("topic")
+        log.notes = request.POST.get("notes", "")
+        log.save()
+
+    # Handle delete
+    if request.method == "POST" and "delete_log" in request.POST:
+        log_id = request.POST.get("log_id")
+        ClassLog.objects.filter(id=log_id, lecturer=request.user).delete()
+
     logs = ClassLog.objects.filter(course=course).order_by("-date")
-    
+    edit_log = None
+    edit_id = request.GET.get("edit")
+    if edit_id:
+        edit_log = get_object_or_404(ClassLog, id=edit_id, lecturer=request.user)
+
     return render(request, "lecturer/class_log.html", {
         "course": course,
         "logs": logs,
+        "edit_log": edit_log,
     })
+
+#--------------------------------------------------------------
 
 
 def role_redirect(request):

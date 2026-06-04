@@ -15,9 +15,12 @@
         tr:hover { background: #f9f9f9; }
         .back { display: inline-block; margin-bottom: 20px; color: #1f3c88; text-decoration: none; font-weight: bold; }
         input, textarea { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        .btn { background: #1f3c88; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
-        .btn:hover { opacity: 0.9; }
+        .btn { background: #1f3c88; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
+        .btn-edit { background: #f0a500; color: white; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-delete { background: crimson; color: white; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn:hover, .btn-edit:hover, .btn-delete:hover { opacity: 0.9; }
         label { font-weight: bold; display: block; margin-bottom: 5px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
     </style>
 </head>
 <body>
@@ -30,16 +33,52 @@
 
     <div class="card">
         <h2>{{ course.code }} - {{ course.name }}</h2>
-        <h3>Log a Class</h3>
+        <h3>{% if edit_log %}Edit Class Log{% else %}Log a Class{% endif %}</h3>
         <form method="post">
             {% csrf_token %}
-            <label>Date</label>
-            <input type="date" name="date" required>
-            <label>Topic Covered</label>
-            <input type="text" name="topic" placeholder="e.g. Introduction to Microsystems" required>
-            <label>Notes (optional)</label>
-            <textarea name="notes" rows="3" placeholder="Any additional notes..."></textarea>
-            <button type="submit" class="btn">Log Class</button>
+            {% if edit_log %}
+                <input type="hidden" name="log_id" value="{{ edit_log.id }}">
+                <div class="form-row">
+                    <div>
+                        <label>Date</label>
+                        <input type="date" name="date" value="{{ edit_log.date|date:'Y-m-d' }}" required>
+                    </div>
+                    <div>
+                        <label>Start Time</label>
+                        <input type="time" name="start_time" value="{{ edit_log.start_time|time:'H:i' }}" required>
+                    </div>
+                    <div>
+                        <label>Duration (hours)</label>
+                        <input type="number" name="duration" step="0.5" min="0.5" value="{{ edit_log.duration }}" required>
+                    </div>
+                </div>
+                <label>Topic Covered</label>
+                <input type="text" name="topic" value="{{ edit_log.topic }}" required>
+                <label>Notes (optional)</label>
+                <textarea name="notes" rows="3">{{ edit_log.notes }}</textarea>
+                <button type="submit" name="edit_log" class="btn">Save Changes</button>
+                <a href="{% url 'class_log' course.id %}" style="margin-left:10px; color:#1f3c88;">Cancel</a>
+            {% else %}
+                <div class="form-row">
+                    <div>
+                        <label>Date</label>
+                        <input type="date" name="date" required>
+                    </div>
+                    <div>
+                        <label>Start Time</label>
+                        <input type="time" name="start_time" required>
+                    </div>
+                    <div>
+                        <label>Duration (hours)</label>
+                        <input type="number" name="duration" step="0.5" min="0.5" placeholder="e.g. 1.5" required>
+                    </div>
+                </div>
+                <label>Topic Covered</label>
+                <input type="text" name="topic" placeholder="e.g. Introduction to Microsystems" required>
+                <label>Notes (optional)</label>
+                <textarea name="notes" rows="3" placeholder="Any additional notes..."></textarea>
+                <button type="submit" name="log_class" class="btn">Log Class</button>
+            {% endif %}
         </form>
     </div>
 
@@ -48,17 +87,33 @@
         <table>
             <tr>
                 <th>Date</th>
+                <th>Start Time</th>
+                <th>Duration (hrs)</th>
                 <th>Topic</th>
                 <th>Notes</th>
+                <th>Actions</th>
             </tr>
             {% for log in logs %}
             <tr>
                 <td>{{ log.date }}</td>
+                <td>{{ log.start_time|time:"H:i" }}</td>
+                <td>{{ log.duration }}</td>
                 <td>{{ log.topic }}</td>
                 <td>{{ log.notes|default:"-" }}</td>
+                <td>
+                    <a href="?edit={{ log.id }}">
+                        <button class="btn-edit">Edit</button>
+                    </a>
+                    <form method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="log_id" value="{{ log.id }}">
+                        <button type="submit" name="delete_log" class="btn-delete"
+                            onclick="return confirm('Delete this log?')">Delete</button>
+                    </form>
+                </td>
             </tr>
             {% empty %}
-            <tr><td colspan="3">No classes logged yet.</td></tr>
+            <tr><td colspan="6">No classes logged yet.</td></tr>
             {% endfor %}
         </table>
     </div>
