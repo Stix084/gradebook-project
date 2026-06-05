@@ -16,6 +16,8 @@
         .back { display: inline-block; margin-bottom: 20px; color: #1f3c88; text-decoration: none; font-weight: bold; }
         .export-btn { display: inline-block; margin-bottom: 20px; margin-left: 20px; background: #1f3c88; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; }
         .export-btn:hover { opacity: 0.9; }
+        .btn-grades { background: #1f3c88; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 13px; }
+        .btn-grades:hover { opacity: 0.9; }
     </style>
 </head>
 <body>
@@ -26,8 +28,37 @@
 <div class="container">
     <a class="back" href="{% url 'lecturer_dashboard' %}">← Back to Dashboard</a>
     <a class="export-btn" href="{% url 'export_course_summary' course.id %}">⬇ Export to Excel</a>
+
+    <!-- Assessments -->
     <div class="card">
         <h2>{{ course.code }} - {{ course.name }}</h2>
+        <h3>Assessments</h3>
+        <table>
+            <tr>
+                <th>Assessment</th>
+                <th>Type</th>
+                <th>Total Marks</th>
+                <th>Weight</th>
+                <th>Action</th>
+            </tr>
+            {% for assessment in assessments %}
+            <tr>
+                <td>{{ assessment.title }}</td>
+                <td>{{ assessment.get_assessment_type_display }}</td>
+                <td>{{ assessment.total_marks }}</td>
+                <td>{{ assessment.weight }}%</td>
+                <td>
+                    <a class="btn-grades" href="{% url 'enter_grades' course.id assessment.id %}">Enter Grades</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5">No assessments yet.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <!-- Grade Summary -->
+    <div class="card">
         <h3>Grade Summary</h3>
         <table>
             <tr>
@@ -42,7 +73,7 @@
             </tr>
             {% for row in rows %}
             <tr>
-                <td>{{ row.student.student_number }}</td>
+                <td>{{ row.student.student_number|default:"-" }}</td>
                 <td>{{ row.student.first_name }}</td>
                 <td>{{ row.student.last_name }}</td>
                 {% for mark in row.non_assignment_marks %}

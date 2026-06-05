@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 
-#------------------------------------------------------------
+
 
 from users.views import (
     role_redirect,
@@ -11,6 +11,7 @@ from users.views import (
     lecturer_course_summary,
     export_course_summary,
     class_log,
+    enter_grades,
     course_detail
 )
 
@@ -24,4 +25,5 @@ urlpatterns = [
     path("lecturer/course/<int:id>/", lecturer_course_summary, name="lecturer_course_summary"),
     path("lecturer/course/<int:id>/export/", export_course_summary, name="export_course_summary"),
     path("lecturer/course/<int:id>/log/", class_log, name="class_log"),
+    path("lecturer/course/<int:course_id>/assessment/<int:assessment_id>/grades/", enter_grades, name="enter_grades"),
 ]

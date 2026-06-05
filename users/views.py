@@ -5,8 +5,71 @@ from enrollments.models import Enrollment
 from courses.models import Course, Grade, Assessment, ClassLog
 from django.utils.dateparse import parse_date
 
+#--------------------------------------------------------------
+@login_required
+def enter_grades(request, course_id, assessment_id):
+    course = get_object_or_404(Course, id=course_id, lecturer=request.user)
+    assessment = get_object_or_404(Assessment, id=assessment_id, course=course)
+    enrollments = Enrollment.objects.filter(course=course).select_related("student")
+
+    errors = []
+
+    if request.method == "POST":
+        for enrollment in enrollments:
+            student = enrollment.student
+            mark_key = f"mark_{student.id}"
+            mark_value = request.POST.get(mark_key, "").strip()
+
+            if mark_value == "":
+                continue
+
+            try:
+                mark = float(mark_value)
+            except ValueError:
+                errors.append(f"{student.username}: invalid mark '{mark_value}'")
+                continue
+
+            if mark > assessment.total_marks:
+                errors.append(
+                    f"{student.username}: mark {mark} exceeds total marks ({assessment.total_marks})"
+                )
+                continue
+
+            if mark < 0:
+                errors.append(f"{student.username}: mark cannot be negative")
+                continue
+
+            Grade.objects.update_or_create(
+                student=student,
+                assessment=assessment,
+                defaults={"marks_obtained": mark}
+            )
+
+        if not errors:
+            return redirect("lecturer_course_summary", id=course_id)
+
+    # Build student rows with existing grades
+    rows = []
+    for enrollment in enrollments:
+        student = enrollment.student
+        existing = Grade.objects.filter(
+            student=student,
+            assessment=assessment
+        ).first()
+        rows.append({
+            "student": student,
+            "existing_mark": existing.marks_obtained if existing else "",
+        })
+
+    return render(request, "lecturer/enter_grades.html", {
+        "course": course,
+        "assessment": assessment,
+        "rows": rows,
+        "errors": errors,
+    })
 
 
+#--------------------------------------------------------------
 @login_required
 def class_log(request, id):
     course = get_object_or_404(Course, id=id, lecturer=request.user)
@@ -144,6 +207,7 @@ def lecturer_course_summary(request, id):
         "course": course,
         "non_assignments": non_assignments,
         "rows": rows,
+        "assessments": assessments,
     })
 
 
