@@ -4,6 +4,54 @@ from courses.models import Course, Grade, Assessment
 from enrollments.models import Enrollment
 from courses.models import Course, Grade, Assessment, ClassLog
 from django.utils.dateparse import parse_date
+from courses.models import Course, Grade, Assessment, ClassLog, Submission 
+import cloudinary.uploader
+
+@login_required
+def submit_assignment(request, assessment_id):
+    assessment = get_object_or_404(Assessment, id=assessment_id)
+    course = assessment.course
+
+    # Only allow submissions for assignments
+    if assessment.assessment_type != "ASSIGNMENT":
+        return redirect("course_detail", id=course.id)
+
+    # Check student is enrolled
+    enrollment = Enrollment.objects.filter(
+        student=request.user,
+        course=course
+    ).first()
+    if not enrollment:
+        return redirect("dashboard")
+
+    existing = Submission.objects.filter(
+        student=request.user,
+        assessment=assessment
+    ).first()
+
+    if request.method == "POST":
+        uploaded_file = request.FILES.get("file")
+        if uploaded_file:
+            result = cloudinary.uploader.upload(
+                uploaded_file,
+                resource_type="raw",
+                folder=f"submissions/{course.code}/{assessment.id}/"
+            )
+            Submission.objects.update_or_create(
+                student=request.user,
+                assessment=assessment,
+                defaults={
+                    "file_url": result["secure_url"],
+                    "file_name": uploaded_file.name,
+                }
+            )
+            return redirect("course_detail", id=course.id)
+
+    return render(request, "student/submit_assignment.html", {
+        "assessment": assessment,
+        "course": course,
+        "existing": existing,
+    })
 
 #--------------------------------------------------------------
 @login_required

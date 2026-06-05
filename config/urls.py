@@ -12,6 +12,7 @@ from users.views import (
     export_course_summary,
     class_log,
     enter_grades,
+    submit_assignment,
     course_detail
 )
 
@@ -26,4 +27,5 @@ urlpatterns = [
     path("lecturer/course/<int:id>/export/", export_course_summary, name="export_course_summary"),
     path("lecturer/course/<int:id>/log/", class_log, name="class_log"),
     path("lecturer/course/<int:course_id>/assessment/<int:assessment_id>/grades/", enter_grades, name="enter_grades"),
+    path("assessment/<int:assessment_id>/submit/", submit_assignment, name="submit_assignment"),
 ]

@@ -1,102 +1,75 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Course Detail</title>
-
+    <title>{{ course.code }} - {{ course.name }}</title>
+    {% load static %}
     <style>
-        body {
-            font-family: Arial;
-            background: #f4f6f9;
-            margin: 0;
-        }
-
-        .header {
-            background: #1f3c88;
-            color: white;
-            padding: 20px;
-        }
-
-        .container {
-            width: 80%;
-            margin: 30px auto;
-        }
-
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        th {
-            background: #f0f0f0;
-        }
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f6f9; }
+        .header { background: #1f3c88; color: white; padding: 20px; display: flex; align-items: center; gap: 15px; }
+        .header img { height: 45px; width: 45px; border-radius: 50%; background: white; }
+        .container { width: 85%; margin: 30px auto; }
+        .card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
+        th { background: #f0f0f0; }
+        .back { display: inline-block; margin-bottom: 20px; color: #1f3c88; text-decoration: none; font-weight: bold; }
+        .score { font-size: 1.5em; font-weight: bold; color: #1f3c88; }
+        .submit-btn { color: #1f3c88; font-weight: bold; text-decoration: none; }
+        .submit-btn:hover { text-decoration: underline; }
     </style>
 </head>
-
 <body>
-
 <div class="header">
-    <h2>{{ course.name }}</h2>
+    <img src="{% static 'images/school_logo.png' %}" alt="Logo">
+    <h2>Student Academic Portal</h2>
 </div>
-
 <div class="container">
+    <a class="back" href="{% url 'dashboard' %}">← Back to Dashboard</a>
 
-    <!-- COURSE INFO -->
     <div class="card">
-        <h3>Course Overview</h3>
-        <p><strong>Code:</strong> {{ course.code }}</p>
-        <p><strong>Description:</strong> {{ course.description }}</p>
+        <h2>{{ course.code }} - {{ course.name }}</h2>
+        <p>Enrollment Status: <strong>{{ enrollment.status|default:"Not Enrolled" }}</strong></p>
     </div>
 
-    <!-- ACADEMIC PERFORMANCE -->
     <div class="card">
-        <h3>Grade Summary</h3>
-
-        <p><strong>Final Score:</strong> {{ final_score|floatformat:2 }}</p>
-
-        <p>
-            <strong>Status:</strong>
-            {% if status == "PASS" %}
-                <span style="color:green;">{{ status }}</span>
-            {% else %}
-                <span style="color:red;">{{ status }}</span>
-            {% endif %}
-        </p>
-    </div>
-
-    <!-- BREAKDOWN -->
-    <div class="card">
-        <h3>Assessment Breakdown</h3>
-
+        <h3>Assessments & Grades</h3>
         <table>
             <tr>
                 <th>Assessment</th>
-                <th>Score</th>
+                <th>Total Marks</th>
                 <th>Weight</th>
+                <th>Your Mark</th>
+                <th>Action</th>
             </tr>
-
-            {% for g in grades %}
+            {% for assessment in assessments %}
             <tr>
-                <td>{{ g.assessment.title }}</td>
-                <td>{{ g.marks_obtained }}/{{ g.assessment.total_marks }}</td>
-                <td>{{ g.assessment.weight }}%</td>
+                <td>{{ assessment.title }}</td>
+                <td>{{ assessment.total_marks }}</td>
+                <td>{{ assessment.weight }}%</td>
+                <td>
+                    {% for grade in grades %}
+                        {% if grade.assessment.id == assessment.id %}
+                            {{ grade.marks_obtained }}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td>
+                    {% if assessment.assessment_type == "ASSIGNMENT" %}
+                        <a class="submit-btn" href="{% url 'submit_assignment' assessment.id %}">Submit</a>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
             </tr>
+            {% empty %}
+            <tr><td colspan="5">No assessments yet.</td></tr>
             {% endfor %}
         </table>
     </div>
 
+    <div class="card">
+        <p>Weighted Final Score: <span class="score">{{ final_score|floatformat:1 }}%</span></p>
+    </div>
 </div>
-
 </body>
 </html>

@@ -97,3 +97,25 @@ class ClassLog(models.Model):
 
     def __str__(self):
         return f"{self.course.code} - {self.topic} ({self.date})"
+
+
+class Submission(models.Model):
+    student = models.ForeignKey(
+        "users.User",
+        on_delete=models.CASCADE,
+        related_name="submissions"
+    )
+    assessment = models.ForeignKey(
+        Assessment,
+        on_delete=models.CASCADE,
+        related_name="submissions"
+    )
+    file_url = models.URLField()
+    file_name = models.CharField(max_length=255)
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("student", "assessment")
+
+    def __str__(self):
+        return f"{self.student} - {self.assessment}"

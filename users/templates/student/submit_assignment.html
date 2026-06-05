@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Submit Assignment - {{ assessment.title }}</title>
+    {% load static %}
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f6f9; }
+        .header { background: #1f3c88; color: white; padding: 20px; display: flex; align-items: center; gap: 15px; }
+        .header img { height: 45px; width: 45px; border-radius: 50%; background: white; }
+        .container { width: 60%; margin: 30px auto; }
+        .card { background: white; padding: 30px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        .back { display: inline-block; margin-bottom: 20px; color: #1f3c88; text-decoration: none; font-weight: bold; }
+        .info { background: #e8f0fe; padding: 10px 15px; border-radius: 6px; margin-bottom: 20px; color: #1f3c88; }
+        .existing { background: #e8f5e9; padding: 10px 15px; border-radius: 6px; margin-bottom: 20px; color: #2e7d32; }
+        input[type="file"] { width: 100%; padding: 10px; border: 2px dashed #1f3c88; border-radius: 6px; margin-bottom: 15px; box-sizing: border-box; }
+        .btn { background: #1f3c88; color: white; padding: 10px 25px; border: none; border-radius: 6px; cursor: pointer; font-size: 15px; }
+        .btn:hover { opacity: 0.9; }
+        label { font-weight: bold; display: block; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+<div class="header">
+    <img src="{% static 'images/school_logo.png' %}" alt="Logo">
+    <h2>Student Academic Portal</h2>
+</div>
+<div class="container">
+    <a class="back" href="{% url 'course_detail' course.id %}">← Back to Course</a>
+
+    <div class="card">
+        <h2>{{ assessment.title }}</h2>
+        <h3>{{ course.code }} - {{ course.name }}</h3>
+
+        <div class="info">
+            Total Marks: <strong>{{ assessment.total_marks }}</strong> &nbsp;|&nbsp;
+            Weight: <strong>{{ assessment.weight }}%</strong>
+        </div>
+
+        {% if existing %}
+        <div class="existing">
+            ✅ You have already submitted: <strong>{{ existing.file_name }}</strong>
+            — submitted on {{ existing.submitted_at|date:"d M Y H:i" }}.
+            Uploading a new file will replace your existing submission.
+        </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label>Upload your assignment file (PDF, Word, etc.)</label>
+            <input type="file" name="file" required>
+            <button type="submit" class="btn">Submit Assignment</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
