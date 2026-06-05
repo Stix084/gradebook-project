@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Enter Grades - {{ assessment.title }}</title>
+    {% load static %}
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f6f9; }
+        .header { background: #1f3c88; color: white; padding: 20px; display: flex; align-items: center; gap: 15px; }
+        .header img { height: 45px; width: 45px; border-radius: 50%; background: white; }
+        .container { width: 85%; margin: 30px auto; }
+        .card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
+        th { background: #1f3c88; color: white; }
+        tr:hover { background: #f9f9f9; }
+        .back { display: inline-block; margin-bottom: 20px; color: #1f3c88; text-decoration: none; font-weight: bold; }
+        input[type="number"] { width: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        .btn { background: #1f3c88; color: white; padding: 10px 25px; border: none; border-radius: 6px; cursor: pointer; font-size: 15px; }
+        .btn:hover { opacity: 0.9; }
+        .error { background: #ffe0e0; border: 1px solid crimson; padding: 10px 15px; border-radius: 6px; margin-bottom: 15px; color: crimson; }
+        .info { background: #e8f0fe; padding: 10px 15px; border-radius: 6px; margin-bottom: 15px; color: #1f3c88; }
+    </style>
+</head>
+<body>
+<div class="header">
+    <img src="{% static 'images/school_logo.png' %}" alt="Logo"
