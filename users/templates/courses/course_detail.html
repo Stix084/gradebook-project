@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <title>{{ course.code }} - {{ course.name }}</title>
@@ -14,6 +14,8 @@
         th { background: #f0f0f0; }
         .back { display: inline-block; margin-bottom: 20px; color: #1f3c88; text-decoration: none; font-weight: bold; }
         .score { font-size: 1.5em; font-weight: bold; color: #1f3c88; }
+        .submit-btn { color: #1f3c88; font-weight: bold; text-decoration: none; }
+        .submit-btn:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -23,12 +25,10 @@
 </div>
 <div class="container">
     <a class="back" href="{% url 'dashboard' %}">← Back to Dashboard</a>
-
     <div class="card">
         <h2>{{ course.code }} - {{ course.name }}</h2>
         <p>Enrollment Status: <strong>{{ enrollment.status|default:"Not Enrolled" }}</strong></p>
     </div>
-
     <div class="card">
         <h3>Assessments & Grades</h3>
         <table>
@@ -37,6 +37,7 @@
                 <th>Total Marks</th>
                 <th>Weight</th>
                 <th>Your Mark</th>
+                <th>Action</th>
             </tr>
             {% for assessment in assessments %}
             <tr>
@@ -48,17 +49,21 @@
                         {% if grade.assessment.id == assessment.id %}
                             {{ grade.marks_obtained }}
                         {% endif %}
-                    {% empty %}
-                        —
                     {% endfor %}
+                </td>
+                <td>
+                    {% if assessment.assessment_type == "ASSIGNMENT" %}
+                        <a class="submit-btn" href="{% url 'submit_assignment' assessment.id %}">Submit</a>
+                    {% else %}
+                        -
+                    {% endif %}
                 </td>
             </tr>
             {% empty %}
-            <tr><td colspan="4">No assessments yet.</td></tr>
+            <tr><td colspan="5">No assessments yet.</td></tr>
             {% endfor %}
         </table>
     </div>
-
     <div class="card">
         <p>Weighted Final Score: <span class="score">{{ final_score|floatformat:1 }}%</span></p>
     </div>
