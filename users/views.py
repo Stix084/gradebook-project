@@ -361,5 +361,17 @@ def export_course_summary(request, id):
     wb.save(response)
     return response
 
+submissions = Submission.objects.filter(
+    assessment=assessment
+   ).select_related("student")
+
+    return render(request, "lecturer/enter_grades.html", {
+    "course": course,
+    "assessment": assessment,
+    "rows": rows,
+    "errors": errors,
+    "submissions": submissions,
+    })
+
 
     

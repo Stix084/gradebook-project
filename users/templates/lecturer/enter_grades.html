@@ -17,8 +17,11 @@
         input[type="number"] { width: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
         .btn { background: #1f3c88; color: white; padding: 10px 25px; border: none; border-radius: 6px; cursor: pointer; font-size: 15px; }
         .btn:hover { opacity: 0.9; }
+        .btn-download { background: #2e7d32; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 13px; }
+        .btn-download:hover { opacity: 0.9; }
         .error { background: #ffe0e0; border: 1px solid crimson; padding: 10px 15px; border-radius: 6px; margin-bottom: 15px; color: crimson; }
         .info { background: #e8f0fe; padding: 10px 15px; border-radius: 6px; margin-bottom: 15px; color: #1f3c88; }
+        .not-submitted { color: #999; font-style: italic; }
     </style>
 </head>
 <body>
@@ -82,6 +85,37 @@
             <button type="submit" class="btn">Save Grades</button>
         </form>
     </div>
+
+    {% if assessment.assessment_type == "ASSIGNMENT" %}
+    <div class="card">
+        <h3>Submissions ({{ submissions.count }})</h3>
+        <table>
+            <tr>
+                <th>Student Number</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>File</th>
+                <th>Submitted At</th>
+                <th>Download</th>
+            </tr>
+            {% for sub in submissions %}
+            <tr>
+                <td>{{ sub.student.student_number|default:"-" }}</td>
+                <td>{{ sub.student.first_name }}</td>
+                <td>{{ sub.student.last_name }}</td>
+                <td>{{ sub.file_name }}</td>
+                <td>{{ sub.submitted_at|date:"d M Y H:i" }}</td>
+                <td>
+                    <a class="btn-download" href="{{ sub.file_url }}" target="_blank">Download</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6">No submissions yet.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+
 </div>
 </body>
 </html>
